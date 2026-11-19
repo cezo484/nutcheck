@@ -1,0 +1,1 @@
+{"description":"Cashu token inspector: decode cashuA and cashuB tokens and check them against their mint","license":"MIT","name":"nutcheck","scripts":{"demo":"node src/demo.js","start":"node src/cli.js","test":"node --test test/*.test.js","web":"node serve.js"},"type":"module","version":"1.0.0"}

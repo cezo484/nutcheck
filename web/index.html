@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NutCheck: Cashu token inspector</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; color: #1a1a1a; }
+  h1 { font-size: 1.4em; }
+  textarea { width: 100%; height: 6em; font-family: monospace; font-size: 0.85em; }
+  button { margin: 0.5em 0.5em 0.5em 0; padding: 0.5em 1em; cursor: pointer; }
+  pre { background: #f4f4f4; padding: 1em; overflow-x: auto; font-size: 0.85em; white-space: pre-wrap; word-break: break-all; }
+  .error { color: #a00; }
+  .muted { color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<h1>NutCheck</h1>
+<p>Paste a Cashu token (cashuA or cashuB) to see what it contains: mint, unit, total, memo, proofs. Everything runs in your browser. Nothing is sent anywhere.</p>
+<textarea id="token" placeholder="cashuAeyJ0b2tlbiI6..."></textarea><br>
+<button id="decode">Decode</button>
+<button id="example">Load example token</button>
+<pre id="out">No token decoded yet.</pre>
+<p class="muted">A decoded token is not a verified token. Only the mint can confirm a proof is unspent, and only at spend time. The command line tool can also ask the mint about its keysets: see the README.</p>
+<script type="module">
+import { decodeToken } from '../src/token.js';
+import { buildReport, buildJsonReport } from '../src/report.js';
+import { V3_SPEC_TOKEN } from '../src/vectors.js';
+
+const out = document.getElementById('out');
+const input = document.getElementById('token');
+
+document.getElementById('decode').addEventListener('click', () => {
+  const text = input.value.trim();
+  if (!text) {
+    out.textContent = 'Paste a token first.';
+    out.className = 'error';
+    return;
+  }
+  try {
+    const token = decodeToken(text);
+    out.textContent = buildReport(token) + '\n\n--- JSON ---\n' + JSON.stringify(buildJsonReport(token), null, 2);
+    out.className = '';
+  } catch (err) {
+    out.textContent = 'Could not decode this token: ' + err.message;
+    out.className = 'error';
+  }
+});
+
+document.getElementById('example').addEventListener('click', () => {
+  input.value = V3_SPEC_TOKEN;
+  document.getElementById('decode').click();
+});
+</script>
+</body>
+</html>
